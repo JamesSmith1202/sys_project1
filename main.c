@@ -45,47 +45,48 @@ void fix_newline(char * line){
 }
 
 int main(){
-char * input_line = malloc(256);//line the user gives
-char ** commands_arr;//the split lines
-char ** line_arr;//the array of commands_arrs
-int num_commands;
-int num_args;
-int counter;
-int child_info;
-pid_t child;
-while(1){//infinite loop
-  counter = 0;//reset counter
-  num_commands = 0;//extra safety
-  num_args = 0;
-  if(!fgets(input_line, 256, stdin)){//get user input and if it fails, exit
-     exit(0);
-  }
-  fix_newline(input_line);//set the user newline to null
-  int num_commands = count_delims(input_line, ";");//count the number of commands separated by ; in the input string
-  commands_arr = parse_args(input_line, ";", num_commands);//break line into individual commands
-  while(counter <= num_commands){//while the program hasnt executed all supplied commands...
-    num_args = count_delims(commands_arr[counter], " ");
-    line_arr = parse_args(input_line, " ", num_args);//parse the args into line_arr
-    //COMMAND EXECUTION
-    if (!strcmp(line_arr[0], "cd")) {//if cmd is cd
-      chdir(line_arr[1]);
+  char * input_line = malloc(256);//line the user gives
+  char ** commands_arr;//the split lines
+  char ** line_arr;//the array of commands_arrs
+  int num_commands;
+  int num_args;
+  int counter;
+  int child_info;
+  pid_t child;
+  while(1){//infinite loop
+    counter = 0;//reset counter
+    num_commands = 0;//extra safety
+    num_args = 0;
+    printf("$ ");
+    if(!fgets(input_line, 256, stdin)){//get user input and if it fails, exit
+       exit(0);
     }
-    else if (!strcmp(line_arr[0], "exit")) {//if cmd is exit
-      exit(0);
-    }
-    else {//otherwise fork and do it
-      child = fork();
-      if (!child) {
-        execvp(line_arr[0], line_arr);
-        printf("No command found\n");
+    fix_newline(input_line);//set the user newline to null
+    int num_commands = count_delims(input_line, ";");//count the number of commands separated by ; in the input string
+    commands_arr = parse_args(input_line, ";", num_commands);//break line into individual commands
+    while(counter <= num_commands){//while the program hasnt executed all supplied commands...
+      num_args = count_delims(commands_arr[counter], " ");
+      line_arr = parse_args(input_line, " ", num_args);//parse the args into line_arr
+      //COMMAND EXECUTION
+      if (!strcmp(line_arr[0], "cd")) {//if cmd is cd
+        chdir(line_arr[1]);
+      }
+      else if (!strcmp(line_arr[0], "exit")) {//if cmd is exit
         exit(0);
       }
-      wait(&child_info);
+      else {//otherwise fork and do it
+        child = fork();
+        if (!child) {
+          execvp(line_arr[0], line_arr);
+          printf("No command found\n");
+          exit(0);
+        }
+        wait(&child_info);
+      }
+      counter++;
+      free(line_arr);
     }
-    counter++;
-    free(line_arr);
+    free(commands_arr);
   }
-free(commands_arr);
-}
-return 0;
+  return 0;
 }
