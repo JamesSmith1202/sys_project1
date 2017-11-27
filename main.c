@@ -25,9 +25,12 @@ char ** parse_args(char * line, char * delim, int num_args){
   char * arg;
   int counter = 0;
   while( (arg=strsep(&line, delim)) ){//while you can remove the delim, do so
+    //printf("arg is %d as an int and %s as a string\n", arg, arg);
+    //   if (arg != ' ') {
     args[counter] = arg;//move over the 2d char array and set it equal to the next divided arg
     printf("piece separated by delim %s:%s\n", delim, arg);
     counter += 1;// added the increment james it wasnt here before
+    //}
   }
   args[counter] = 0;//set last to null for execvp
   return args;
@@ -115,7 +118,7 @@ int main(){
       current_arg++;
       if (current_arg == num_args) {
 	printf("freeing args_line before reallocating\n");
-	free(args_line);
+	//free(args_line);
 	current_arg = 0;
 	num_args = 0;
       }
@@ -132,7 +135,7 @@ int main(){
 	printf("inside the delims if\n");
 	num_args = num_delims + 1;
 	printf("num delims: %d\n", num_delims);
-	args_line = parse_args(input_line, ";", num_args);
+	args_line = parse_args(input_line, " ; ", num_args);
 	print_arr(args_line);
 	input_line = args_line[current_arg];
 	printf("the first line: %s\n", input_line);
