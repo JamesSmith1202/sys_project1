@@ -15,9 +15,9 @@ int count_delims(char* line, char delim){
   return ctr;
 }
 
-char ** parse_args(char * line, char delim){
-  int num_args = count_delims(line, delim) + 1;
-  char ** args = (char **)calloc(num_args, sizeof(char*));//allocate space for the possible args + ending null for execvp
+char ** parse_args(char * line, char * delim, int num_args){
+  printf("num args given to parse_args: %d\n", num_args);
+  char ** args = (char **)calloc(num_args+1, sizeof(char*));//allocate space for the possible args + ending null for execvp
   if(!args){//check if memory was allocated
     printf("Memory Allocation Failed\n");
     exit(1);
@@ -26,27 +26,10 @@ char ** parse_args(char * line, char delim){
   int counter = 0;
   while( (arg=strsep(&line, delim)) ){//while you can remove the delim, do so
     args[counter] = arg;//move over the 2d char array and set it equal to the next divided arg
+    printf("piece separated by delim %s:%s\n", delim, arg);
     counter += 1;// added the increment james it wasnt here before
   }
   args[counter] = 0;//set last to null for execvp
-  return args;
-}
-
-char ** parse_args_cruse(char * line){//your code was kinda buggy so this autoseparates on spaces
-  char ** args = (char **)calloc(6, sizeof(char*));//allocate space for the 5 possible args + ending null for execvp
-  if(!args){//check if memory was allocated
-    printf("Memory Allocation Failed\n");
-    exit(1);
-  }
-  char * arg;
-  int counter = 0;
-  while( (arg=strsep(&line, " ")) ){//while you can remove spaces, do so
-    args[counter] = arg;//move over the 2d char array and set it equal to the next divided arg
-    //printf("arg[%d]: %s\n", counter, args[counter]);
-    counter++;
-  }
-  args[counter] = 0;//set last to null for execvp
-  //printf("arg[%d]: %s\n", counter, args[counter]);
   return args;
 }
 
@@ -104,7 +87,9 @@ void fix_newline(char ** string_arr) {//replaces the one buggy newline that appe
     //printf("The %d letter of the word: %c\n", subctr, string_arr[counter-1][subctr]);
     subctr++;
   }//one less than final pos in final string is the newline char
-  string_arr[counter-1][subctr-1] = 0;//set it to null to fix
+  if (string_arr[counter-1][subctr-1] == '\n') {
+    string_arr[counter-1][subctr-1] = 0;//set it to null to fix
+  }
 }  
   
 
@@ -114,6 +99,9 @@ int main(){
   char ** args_line;//the split lines 
   char ** line_arr;//the array of args_lines
   int i = 0;//index counter
+  int num_args = 0;
+  int current_arg = 0;
+  int num_delims = 0;
   int child_info;
   pid_t child;
   while(1){//infinite loop
@@ -121,23 +109,44 @@ int main(){
     printf("Loop Number: %d\n", i);//lets you know how long it been
     i++;
 
-    /*
-    //printf("%d\n", scanf("%s", input_line));
-    scanf("%s", input_line);
-    //printf("%s\n", input_line);
-    line_arr = parse_args_cruse(input_line);
-    */
-    if(!fgets(input_line, 256, stdin)){//get user input
-      printf("Error gaining input...\n");
-      exit(0);
+    if (num_args > current_arg) {
+      printf("inside the num args else\n");
+      input_line = args_line[current_arg];
+      current_arg++;
+      if (current_arg == num_args) {
+	printf("freeing args_line before reallocating\n");
+	free(args_line);
+	current_arg = 0;
+	num_args = 0;
+      }
     }
 
+    else {
+      printf("inside the first else\n");
+      if(!fgets(input_line, 256, stdin)){//get user input
+	printf("Error gaining input...\n");
+	exit(0);
+      }
+
+      if ((num_delims = count_delims(input_line, ';'))) {
+	printf("inside the delims if\n");
+	num_args = num_delims + 1;
+	printf("num delims: %d\n", num_delims);
+	args_line = parse_args(input_line, ";", num_args);
+	print_arr(args_line);
+	input_line = args_line[current_arg];
+	printf("the first line: %s\n", input_line);
+	current_arg++;
+      }
+    }
     //printf("%s\n", input_line);
     
-    line_arr = parse_args_cruse(input_line);//parse the args into line_arr
+    line_arr = parse_args(input_line, " ", count_delims(input_line, ' ') + 1);//parse the args into line_arr
+    print_arr(line_arr);
     //print_chars_in_arr(line_arr);
     fix_newline(line_arr);//fix buggy newline
     //print_chars_in_arr(line_arr);
+    print_arr(line_arr);
 
     if (!strcmp(line_arr[0], "cd")) {//if cmd is cd
       chdir(line_arr[1]);//use chdir
@@ -151,32 +160,14 @@ int main(){
       child = fork();
     
       if (!child) {
-	//printf("made it here\n");
 	execvp(line_arr[0], line_arr);
-	printf("made past it here\n");
+	printf("execution of command failed\n");
 	exit(0);
       }
     
       wait(&child_info);
     }
 
-    /*
-    if(!fgets(input_line, sizeof(stdin), stdin)){//get user input
-      printf("Error gaining input...\n");
-      exit(0);
-    }
-    line_arr = parse_args(input_line, " ");//parse input line for multiple commands
-    i = 0;
-    while(!line_arr[i]){//while there are more lines of instructions to execute...
-      args_line = parse_args(line_arr[i], " ");//split on spaces for execvp
-      child = fork();
-      if (!child){//if it is the child process
-	execvp(args_line[0], args_line);//turn the child into the executed program
-      }
-      free(args_line);
-    }
-    free(line_arr);
-    */
   }
   return 0;
 }
