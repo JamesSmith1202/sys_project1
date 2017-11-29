@@ -18,7 +18,7 @@ int count_delims(char* line, char* delim){
   char * target = line;
   while(target = strstr(target, delim)){
     counter++;
-    target += len;
+    target += 1;
   }
   return counter;
 }
@@ -38,7 +38,7 @@ char ** parse_args(char * line, char * delim, int num_commands){
   args[counter] = 0;//set last to null for execvp
   return args;
 }
-/*
+
 char ** parse_semi(char * line, char * delim, int num_commands){
   char * target = line;
   char ** commands = (char **)calloc(num_commands+1, sizeof(char*));
@@ -58,7 +58,7 @@ char ** parse_semi(char * line, char * delim, int num_commands){
       for (i = 0; i<len;i++){
         target[i] = 0;
       }
-      commands[counter] = target + 3;
+      commands[counter] = target + len;
       counter++;
     }
   }
@@ -82,7 +82,7 @@ char * strip_spaces(char * line){
   printf("%s-\n", line);
   return line;
 }
-*/
+
 
 int main(){
   char * input_line = malloc(256);//line the user gives
@@ -102,11 +102,11 @@ int main(){
        exit(0);
     }
     fix_newline(input_line);//set the user newline to null
-    int num_commands = count_delims(input_line, ";");//count the number of commands separated by ; in the input string
+    num_commands = count_delims(input_line, ";");//count the number of commands separated by ; in the input string
     commands_arr = parse_args(input_line, ";", num_commands);//break line into individual commands
     print_arr(commands_arr);
     while(counter <= num_commands){//while the program hasnt executed all supplied commands...
-      num_args = count_delims(commands_arr[counter], " ");
+      num_args = count_delims(commands_arr[counter], " ") + 1;
       line_arr = parse_args(input_line, " ", num_args);//parse the args into line_arr
       //COMMAND EXECUTION
       if (!strcmp(line_arr[0], "cd")) {//if cmd is cd
