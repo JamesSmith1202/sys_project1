@@ -35,7 +35,7 @@ char ** parse_args(char * line, char * delim, int num_commands){
   }
   while( (arg=strsep(&line, delim)) ){//while you can remove the delim, do so
     args[counter] = arg;//move over the 2d char array and set it equal to the next divided arg
-    counter += 1;
+    counter++;
   }
   args[counter] = 0;//set last to null for execvp
   return args;
@@ -75,12 +75,12 @@ int main(){
        exit(0);
     }
     fix_newline(input_line);//set the user newline to null
-    int num_commands = count_delims(input_line, ";");//count the number of commands separated by ; in the input string
+    num_commands = count_delims(input_line, ";");//count the number of commands separated by ; in the input string
     commands_arr = parse_args(input_line, ";", num_commands);//break line into individual commands
     while(counter < num_commands){//while the program hasnt executed all supplied commands...
       commands_arr[counter] = strip_spaces(commands_arr[counter]);
       num_args = count_delims(commands_arr[counter], " ");
-      line_arr = parse_args(input_line, " ", num_args);//parse the args into line_arr
+      line_arr = parse_args(commands_arr[counter], " ", num_args);//parse the args into line_arr
       //COMMAND EXECUTION
       if (!strcmp(line_arr[0], "cd")) {//if cmd is cd
         chdir(line_arr[1]);
