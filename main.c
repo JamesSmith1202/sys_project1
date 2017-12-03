@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <sys/wait.h>
+#define BLUE    "\x1b[34m"
+#define GREEN   "\x1b[32m"
+#define RESET   "\x1b[0m"
 
 void print_arr(char ** string_arr) {//prints all strings in an arr of strings
   int counter = 0;
@@ -59,6 +62,7 @@ char * strip_spaces(char * line){
 
 int main(){
   char * input_line = malloc(256);//line the user gives
+  char * cwd;//string for the current working directory
   char ** commands_arr;//the split lines
   char ** line_arr;//the array of commands_arrs
   int num_commands;
@@ -70,7 +74,7 @@ int main(){
     counter = 0;//reset counter
     num_commands = 0;//extra safety
     num_args = 0;
-    printf("$ ");
+    printf(GREEN "@" BLUE "%s$ " RESET, getcwd(cwd, 256));
     if(!fgets(input_line, 256, stdin)){//get user input and if it fails, exit
        exit(0);
     }
@@ -100,7 +104,9 @@ int main(){
       counter++;
       free(line_arr);
     }
+    free(cwd);
     free(commands_arr);
   }
+  free(input_line);
   return 0;
 }
