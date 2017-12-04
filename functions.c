@@ -77,8 +77,8 @@ char * combine_strings(char** line_arr, int end){
   char * ret = malloc(BUFFER_SIZE);
   int i = 0;
   for(;i < end; i++){
-    printf("%s\n",strcat(ret, line_arr[i]));
-    strcat(ret, " ");
+    ret = strcat(ret, line_arr[i]);
+    ret = strcat(ret, " ");
   }
   return ret;
 }
@@ -99,7 +99,6 @@ void execute_child(char ** line_arr){
       redirect(line_arr, fd, STDIN_FILENO);
     }
     else if (!strcmp(line_arr[i],"|")) {
-      printf("%d\n", i);
       char * command = combine_strings(line_arr, i);
       FILE * stdout = popen(command, "r");
       free(command);
