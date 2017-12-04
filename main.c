@@ -4,9 +4,11 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <sys/wait.h>
+#include <errno.h>
+
 #define BLUE    "\x1b[34m"
-#define GREEN   "\x1b[32m"
 #define RESET   "\x1b[0m"
+#define BUFFER_SIZE 256
 
 void print_arr(char ** string_arr) {//prints all strings in an arr of strings
   int counter = 0;
@@ -60,28 +62,13 @@ char * strip_spaces(char * line){
   return line;
 }
 
-int main(){
-  char * input_line = malloc(256);//line the user gives
-  char * cwd;//string for the current working directory
-  char ** commands_arr;//the split lines
-  char ** line_arr;//the array of commands_arrs
-  int num_commands;
+void execute(int num_commands, char ** commands_arr){
+  int counter = 0;
   int num_args;
-  int counter;
   int child_info;
   pid_t child;
-  while(1){//infinite loop
-    counter = 0;//reset counter
-    num_commands = 0;//extra safety
-    num_args = 0;
-    printf(GREEN "@" BLUE "%s$ " RESET, getcwd(cwd, 256));
-    if(!fgets(input_line, 256, stdin)){//get user input and if it fails, exit
-       exit(0);
-    }
-    fix_newline(input_line);//set the user newline to null
-    num_commands = count_delims(input_line, ";");//count the number of commands separated by ; in the input string
-    commands_arr = parse_args(input_line, ";", num_commands);//break line into individual commands
-    while(counter < num_commands){//while the program hasnt executed all supplied commands...
+  char ** line_arr;//the array of commands_arrs
+  while(counter < num_commands){//while the program hasnt executed all supplied commands...
       commands_arr[counter] = strip_spaces(commands_arr[counter]);
       num_args = count_delims(commands_arr[counter], " ");
       line_arr = parse_args(commands_arr[counter], " ", num_args);//parse the args into line_arr
@@ -103,10 +90,28 @@ int main(){
       }
       counter++;
       free(line_arr);
-    }
-    free(cwd);
+  }
+}
+
+void get_input(char ** input){
+  char cwd[BUFFER_SIZE];//string for the current working directory
+  printf(BLUE "%s$ " RESET, getcwd(cwd, BUFFER_SIZE)); //prompt with the current directory
+  if(!fgets(*input, BUFFER_SIZE, stdin)){//get user input and if it fails, exit
+    exit(0);
+  }
+  fix_newline(*input);//set the user newline to null
+}
+
+int main(){
+  char * input_line = malloc(BUFFER_SIZE);//line the user gives
+  char ** commands_arr;//the split lines
+  int num_commands;
+  while(1){//infinite loop
+    get_input(&input_line);
+    num_commands = count_delims(input_line, ";");//count the number of commands separated by ; in the input string
+    commands_arr = parse_args(input_line, ";", num_commands);//break line into individual commands
+    execute(num_commands, commands_arr);
     free(commands_arr);
   }
-  free(input_line);
   return 0;
 }
