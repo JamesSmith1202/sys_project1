@@ -5,6 +5,9 @@
 #include <ctype.h>
 #include <sys/wait.h>
 #include <errno.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #define BLUE    "\x1b[34m"
 #define RESET   "\x1b[0m"
@@ -62,6 +65,44 @@ char * strip_spaces(char * line){
   return line;
 }
 
+void redirect_in(char **line_arr, int num_args) {
+  int i;
+  char * f;
+  int in;
+  for (i = 0; line_arr[i]; i++) {
+    if (!strcmp(line_arr[i], "<")) {
+      f = line_arr[i+1];
+      in = open(f, O_RDONLY);
+      dup2(in, 0);
+      close(in);
+      memmove(line_arr+i, line_arr+i+1, (num_args-i)*sizeof(char *));
+    }
+  }
+}
+
+void redirect_out(char ** line_arr, int num_args){// >
+  int i;
+  for (i = 0; line_arr[i]; i++) {
+    int out;
+    char *f;
+    if (!strcmp(line_arr[i],">")) {   
+      f = line_arr[i+1];
+      out = open(f, O_WRONLY | O_APPEND | O_CREAT, 0664);
+      dup2(out, 1);
+      close(out);
+      memmove(line_arr+i, line_arr+i+1, (num_args-i)*sizeof(char *));
+    }
+  }
+}
+
+void execute_child(char ** line_arr, int num_args){
+  redirect_in(line_arr, num_args);
+  redirect_out(line_arr, num_args);
+  execvp(line_arr[0], line_arr);
+  printf("No command found\n");
+  exit(0);
+}
+
 void execute(int num_commands, char ** commands_arr){
   int counter = 0;
   int num_args;
@@ -82,9 +123,7 @@ void execute(int num_commands, char ** commands_arr){
       else {//otherwise fork and do it
         child = fork();
         if (!child) {
-          execvp(line_arr[0], line_arr);
-          printf("No command found\n");
-          exit(0);
+          execute_child(line_arr, num_args);
         }
         wait(&child_info);
       }
