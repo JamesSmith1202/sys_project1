@@ -1,4 +1,4 @@
-IssaShell
+#IssaShell
 by James Smith and Jack Cruse
 
 Features:
@@ -15,7 +15,8 @@ Bugs:
 Files & Function Headers:
 functions.c
 	Handles the execution of commands once they are parsed for semicolons
-	/*======== void print_arr() ==========
+	
+    /*======== void print_arr() ==========
 	Inputs:  char ** string_arr 
 	Returns: Void
     
