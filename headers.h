@@ -1,0 +1,10 @@
+void print_arr(char **);
+int count_delims(char* , char*);
+char ** parse_args(char * , char *, int );
+void fix_newline(char *);
+char * strip_spaces(char * );
+void redirect_in(char **, int);
+void redirect_out(char ** , int );
+void execute_child(char ** , int);
+void execute(int , char ** );
+void get_input(char ** );
