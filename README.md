@@ -1,18 +1,18 @@
-#IssaShell
+# IssaShell
 by James Smith and Jack Cruse
 
-####Features:
+#### Features:
 	Forks and executes commands!
 	Parses multiple commands on one line!
 
-####Attempted:
+#### Attempted:
 	The following did not end up working, but have been left in the code, commented out.
 	Could not get pipes to work
     Could not get redirection working. Only works with some commands (works with ls > file.txt but not ls -l > file.txt)
 
-####Bugs:
+#### Bugs:
 	
-####Files & Function Headers:
+#### Files & Function Headers:
 
 **functions.c**
 	Handles the execution of commands once they are parsed for semicolons
