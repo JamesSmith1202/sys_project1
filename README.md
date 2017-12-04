@@ -6,6 +6,7 @@ by James Smith and Jack Cruse
 	Parses multiple commands on one line!
 	Redirection > , <
 	Single Pipes
+	Displays the current working directory
 #### Attempted:
 	The following did not end up working, but have been left in the code, commented out.
 	Multiple redirections and pipes. The code is there, but the recursive call needs to be flushed out, but due to time restraints we couldn't afford to fix it.
