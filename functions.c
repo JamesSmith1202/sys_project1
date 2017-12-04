@@ -73,6 +73,16 @@ void redirect(char ** arr, int source_fd, int dest_fd) {
   dup2(temp, dest_fd);
 }
 
+char * combine_strings(char** line_arr, int end){
+  char * ret = malloc(BUFFER_SIZE);
+  int i = 0;
+  for(;i < end; i++){
+    printf("%s\n",strcat(ret, line_arr[i]));
+    strcat(ret, " ");
+  }
+  return ret;
+}
+
 void execute_child(char ** line_arr){
   int i = 0;
   int fd;
@@ -89,9 +99,12 @@ void execute_child(char ** line_arr){
       redirect(line_arr, fd, STDIN_FILENO);
     }
     else if (!strcmp(line_arr[i],"|")) {
-      FILE * stdout = popen(line_arr[0], "r");
+      printf("%d\n", i);
+      char * command = combine_strings(line_arr, i);
+      FILE * stdout = popen(command, "r");
+      free(command);
       line_arr[i] = '\0';
-      redirect(line_arr+i+1, (*stdout)._fileno, STDIN_FILENO);
+      redirect(line_arr+i+1, fileno(stdout), STDIN_FILENO);
       pclose(stdout);
     }
   }
