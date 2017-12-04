@@ -4,11 +4,11 @@ by James Smith and Jack Cruse
 #### Features:
 	Forks and executes commands!
 	Parses multiple commands on one line!
-
+	Redirection > , <>
 #### Attempted:
 	The following did not end up working, but have been left in the code, commented out.
 	Could not get pipes to work
-    Could not get redirection working. Only works with some commands (works with ls > file.txt but not ls -l > file.txt)
+    Only single redirection works. You can only use '>' or '<' and only once
 
 #### Bugs:
 	Isolating text with quotation marks does not work (ex. "This sentence would not be isolated")

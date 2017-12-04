@@ -5,6 +5,6 @@ void fix_newline(char *);//removes the newline from the end of the line on user 
 char * strip_spaces(char * );//trims the spaces on the left and right sides of a string
 void redirect_in(char **, int);//handles all redirections for standard in given the array of split commands and the length of the array.
 void redirect_out(char ** , int );//handles all redirections to standard out given the array of split commands and the length of the array
-void execute_child(char ** , int);//function that handles all command executions done by the child
+void execute_child(char **);//function that handles all command executions done by the child
 void execute(int , char ** );//General execution function that handles the parent executions(cd and exit) or forks a child and sends it to execute_child
 void get_input(char ** );//gets input from the user

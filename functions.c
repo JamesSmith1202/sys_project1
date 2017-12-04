@@ -66,58 +66,35 @@ char * strip_spaces(char * line){
   return line;
 }
 
-void redirect_in(char **line_arr, int num_args) {// < 
-  int i;
-  int in;
-  for (i = 0; line_arr[i]; i++) {
-    if (!strcmp(line_arr[i], "<")) {
-      in = open(line_arr[i+1], O_RDONLY);
-      dup2(in, 0);
-      close(in);
-      memmove(line_arr+i, line_arr+i+2, (num_args-i)*sizeof(char *));
+void redirect(char ** arr, int source_fd, int dest_fd) {
+  int temp = dup(dest_fd);
+  dup2(source_fd, dest_fd);
+  execute_child(arr);
+  dup2(temp, dest_fd);
+}
+
+void execute_child(char ** line_arr){
+  int i = 0;
+  int fd;
+  for(;line_arr[i]; i++){
+    if (!strcmp(line_arr[i],">")) {
+      fd = open(line_arr[i+1], O_CREAT | O_WRONLY, 0644);
+      line_arr[i] = '\0';
+      redirect(line_arr, fd, STDOUT_FILENO);
+    }
+    //redirect <
+    else if (!strcmp(line_arr[i],"<")) {
+      fd = open(line_arr[i+1], O_RDONLY);
+      line_arr[i] = '\0';
+      redirect(line_arr, fd, STDIN_FILENO);
+    }
+    else if (!strcmp(line_arr[i],"|")) {
+      FILE * stdout = popen(line_arr[0], "r");
+      line_arr[i] = '\0';
+      redirect(line_arr+i+1, (*stdout)._fileno, STDIN_FILENO);
+      pclose(stdout);
     }
   }
-}
-
-void redirect_out(char ** line_arr, int num_args){// >
-  int i;
-  int out;
-  for (i = 0; line_arr[i]; i++) {
-    if (!strcmp(line_arr[i],">")) {   
-      out = open(line_arr[i+1], O_WRONLY | O_APPEND | O_CREAT, 0664);
-      dup2(out, 1);
-      close(out);
-      memmove(line_arr+i, line_arr+i+2, (num_args-i)*sizeof(char *));
-    }
-  }
-}
-
-int pipe_it(char ** c1, char ** c2) {
-	char c1_s[BUFFER_SIZE];
-	char c2_s[BUFFER_SIZE];
-  cmd1_str[0] = 0;
-  cmd2_str[0] = 0;
-	arr_strncat(cmd1_str, cmd1);
-	arr_strncat(cmd2_str, cmd2);
-	FILE *one = popen(cmd1_str, "r");
-	FILE *two = popen(cmd2_str, "w");
-	char input[512];
-	
-	//reads one line of input at a time
-	while (fgets(input, sizeof(input), one)) {
-		int len = fprintf(two, "%s", input);
-		//printf("%d bytes written\n", len);
-	}
-	
-	pclose(one);
-	pclose(two);
-	
-	return 0;
-}
-
-void execute_child(char ** line_arr, int num_args){
-  redirect_in(line_arr, num_args);
-  redirect_out(line_arr, num_args);
   execvp(line_arr[0], line_arr);
   printf("No command found\n");
   exit(0);
@@ -143,7 +120,7 @@ void execute(int num_commands, char ** commands_arr){
       else {//otherwise fork and do it
         child = fork();
         if (!child) {
-          execute_child(line_arr, num_args);
+          execute_child(line_arr);
         }
         wait(&child_info);
       }
