@@ -4,17 +4,17 @@ by James Smith and Jack Cruse
 #### Features:
 	Forks and executes commands!
 	Parses multiple commands on one line!
-	Redirection > , <>
+	Redirection > , <
+	Single Pipes
 #### Attempted:
 	The following did not end up working, but have been left in the code, commented out.
-	Could not get pipes to work
-    Only single redirection works. You can only use '>' or '<' and only once
+	Multiple redirections and pipes. The code is there, but the recursive call needs to be flushed out, but due to time restraints we couldn't afford to fix it.
 
 #### Bugs:
 	Isolating text with quotation marks does not work (ex. "This sentence would not be isolated")
 	Limitation of 256 chars on input and current working directory display
 	Tokens must be separated by spaces
-	Redirection to standard out doesn't work with certain commands on windows(works with ls > file.txt but not ls -l > file.txt), but appears to work on linux and macOS.
+	Multiple redirections and pipes fail
 
 #### Files & Function Headers:
 
@@ -59,20 +59,21 @@ by James Smith and Jack Cruse
     Trims the spaces on the left and right sides of a string. Returns pointer to new start of string.
 	====================*/
 
-    /*======== void redirect_in() ==========
-	Inputs: char ** line_arr
-            int num_args 
+    /*======== char * combine_strings() ==========
+	Inputs: char** line_arr
+			int i
 	Returns: Void 
     
-    Handles all redirections for standard in given the array of split commands and the length of the array.
+    Takes all of the string elements and concatenates the first i elements into one string separated by spaces
 	====================*/
 
-    /*======== void redirect_out() ==========
-	Inputs: char ** line_arr
-            int num_args
+    /*======== void redirect() ==========
+	Inputs: char ** arr
+			int source_fd
+			int dest_fd
 	Returns: Void
 
-    Handles all redirections to standard out given the array of split commands and the length of the array
+   	Handles all redirections given the array of split commands and the source and destination file descriptors
 	====================*/
 
     /*======== void execute_child() ==========

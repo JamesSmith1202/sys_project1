@@ -88,7 +88,7 @@ void execute_child(char ** line_arr){
   int fd;
   for(;line_arr[i]; i++){
     if (!strcmp(line_arr[i],">")) {
-      fd = open(line_arr[i+1], O_CREAT | O_WRONLY, 0644);
+      fd = open(line_arr[i+1], O_CREAT | O_WRONLY | O_TRUNC, 0644);
       line_arr[i] = '\0';
       redirect(line_arr, fd, STDOUT_FILENO);
     }
