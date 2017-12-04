@@ -66,7 +66,7 @@ char * strip_spaces(char * line){
   return line;
 }
 
-void redirect_in(char **line_arr, int num_args) {
+void redirect_in(char **line_arr, int num_args) {// < 
   int i;
   int in;
   for (i = 0; line_arr[i]; i++) {
@@ -90,6 +90,29 @@ void redirect_out(char ** line_arr, int num_args){// >
       memmove(line_arr+i, line_arr+i+2, (num_args-i)*sizeof(char *));
     }
   }
+}
+
+int pipe_it(char ** c1, char ** c2) {
+	char c1_s[BUFFER_SIZE];
+	char c2_s[BUFFER_SIZE];
+  cmd1_str[0] = 0;
+  cmd2_str[0] = 0;
+	arr_strncat(cmd1_str, cmd1);
+	arr_strncat(cmd2_str, cmd2);
+	FILE *one = popen(cmd1_str, "r");
+	FILE *two = popen(cmd2_str, "w");
+	char input[512];
+	
+	//reads one line of input at a time
+	while (fgets(input, sizeof(input), one)) {
+		int len = fprintf(two, "%s", input);
+		//printf("%d bytes written\n", len);
+	}
+	
+	pclose(one);
+	pclose(two);
+	
+	return 0;
 }
 
 void execute_child(char ** line_arr, int num_args){

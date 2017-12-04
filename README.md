@@ -11,7 +11,11 @@ by James Smith and Jack Cruse
     Could not get redirection working. Only works with some commands (works with ls > file.txt but not ls -l > file.txt)
 
 #### Bugs:
-	
+	Isolating text with quotation marks does not work (ex. "This sentence would not be isolated")
+	Limitation of 256 chars on input and current working directory display
+	Tokens must be separated by spaces
+	Redirection to standard out doesn't work with certain commands on windows(works with ls > file.txt but not ls -l > file.txt), but appears to work on linux and macOS.
+
 #### Files & Function Headers:
 
 **functions.c**
