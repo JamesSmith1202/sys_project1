@@ -12,7 +12,7 @@
 
 #define BLUE    "\x1b[34m"
 #define RESET   "\x1b[0m"
-#define BUFFER_SIZE 256ma
+#define BUFFER_SIZE 256
 
 int main(){
   char * input_line = malloc(BUFFER_SIZE);//line the user gives
